@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>{{ 'admin.assignRoles' | translate }}</h2>
+
+<mat-dialog-content>
+  <p class="mb-3">{{ data.user.firstName }} {{ data.user.lastName }}</p>
+  <form [formGroup]="form" fxLayout="column" fxLayoutGap="12px">
+    <mat-form-field>
+      <mat-select [placeholder]="'common.roles' | translate" formControlName="roleIds" multiple>
+        @for (role of data.roles; track role.id) {
+          <mat-option [value]="role.id">{{ role.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close [matTooltip]="'action.cancel' | translate" matTooltipPosition="above">{{ 'action.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [matTooltip]="'action.assign' | translate" matTooltipPosition="above">{{ 'action.assign' | translate }}</button>
+</mat-dialog-actions>

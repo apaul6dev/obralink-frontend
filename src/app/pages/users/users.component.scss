@@ -10,21 +10,16 @@
   overflow-x: auto;
 }
 
-.admin-table {
+.w-100 {
   width: 100%;
-  border-collapse: collapse;
 }
 
-.admin-table th,
-.admin-table td {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  padding: 12px;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.admin-table tr.selected {
+.mat-mdc-row.selected {
   background: rgba(63, 81, 181, 0.08);
+}
+
+.mat-mdc-row:hover {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .actions {
@@ -33,10 +28,7 @@
 }
 
 .empty {
+  padding: 24px;
   text-align: center;
   color: rgba(0, 0, 0, 0.54);
-}
-
-.mt-3 {
-  margin-top: 24px;
 }

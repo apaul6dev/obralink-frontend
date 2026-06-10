@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>{{ isEditMode ? ('user.edit' | translate) : ('user.create' | translate) }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" fxLayout="column" fxLayoutGap="12px">
+    @if (data.isSystemOwner) {
+      <mat-form-field>
+        <mat-select [placeholder]="'common.company' | translate" formControlName="companyId">
+          @for (company of data.companies; track company.id) {
+            <mat-option [value]="company.id">{{ company.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+    <mat-form-field>
+      <input matInput [placeholder]="'user.loginEmail' | translate" formControlName="email" [readonly]="isEditMode">
+      <mat-error>{{ 'common.emailRequired' | translate }}</mat-error>
+    </mat-form-field>
+    @if (!isEditMode) {
+      <mat-form-field>
+        <input matInput [placeholder]="'user.temporaryPassword' | translate" formControlName="password" type="password">
+        <mat-error>{{ 'common.passwordMin' | translate }}</mat-error>
+      </mat-form-field>
+    }
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'user.firstName' | translate" formControlName="firstName">
+        <mat-error>{{ 'user.firstNameRequired' | translate }}</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'user.lastName' | translate" formControlName="lastName">
+        <mat-error>{{ 'user.lastNameRequired' | translate }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <mat-select [placeholder]="'user.type' | translate" formControlName="userType" [disabled]="isEditMode">
+          @for (type of userTypes; track type) {
+            <mat-option [value]="type">{{ type }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-select [placeholder]="'common.status' | translate" formControlName="status">
+          @for (status of statuses; track status) {
+            <mat-option [value]="status">{{ status }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <input matInput [placeholder]="'user.identificationNumber' | translate" formControlName="identificationNumber">
+    </mat-form-field>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'user.personalEmail' | translate" formControlName="personalEmail">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'user.phoneNumber' | translate" formControlName="phoneNumber">
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close [matTooltip]="'action.cancel' | translate" matTooltipPosition="above">{{ 'action.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [matTooltip]="'action.save' | translate" matTooltipPosition="above">{{ 'action.save' | translate }}</button>
+</mat-dialog-actions>

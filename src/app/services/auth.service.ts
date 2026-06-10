@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { AuthenticatedUser, AuthSession, LoginRequest } from '../common/models/auth.model';
+import { MenuService } from './menu.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class AuthService {
   public readonly session$ = this.sessionSubject.asObservable();
   public readonly user$ = this.session$.pipe(map(session => session ? this.toAuthenticatedUser(session) : null));
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private menuService: MenuService) { }
 
   get session(): AuthSession | null {
     return this.sessionSubject.value;
@@ -60,6 +61,7 @@ export class AuthService {
       tap(() => {
         this.sessionLoaded = true;
         this.sessionSubject.next(null);
+        this.menuService.clearMenu();
         this.router.navigate(['/login']);
       })
     );

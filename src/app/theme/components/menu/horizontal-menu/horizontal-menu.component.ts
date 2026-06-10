@@ -25,7 +25,7 @@ import { TranslatePipe } from '../../../pipes/translate.pipe';
 })
 export class HorizontalMenuComponent implements OnInit {
   @Input('menuParentId') menuParentId: any;
-  public menuItems: Array<any>;
+  public menuItems: Array<any> = [];
   public settings: Settings;
   @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
   constructor(public settingsService: SettingsService, public menuService: MenuService, public router:Router) { 
@@ -33,8 +33,10 @@ export class HorizontalMenuComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.menuItems = this.menuService.getHorizontalMenuItems();
-    this.menuItems = this.menuItems.filter(item => item.parentId == this.menuParentId);
+    this.menuService.menuItems$.subscribe(menuItems => {
+      this.menuItems = menuItems.filter(item => item.parentId == this.menuParentId);
+    });
+    this.menuService.loadAuthorizedMenu().subscribe();
   }
 
   ngAfterViewInit(){

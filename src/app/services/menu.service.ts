@@ -1,23 +1,52 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common'; 
-import { verticalMenuItems, horizontalMenuItems } from '../common/data/menu';
+import { BehaviorSubject, Observable, catchError, of, tap } from 'rxjs';
 import { Menu } from '../common/models/menu.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuService {
+  private readonly apiUrl = '/api/identity/menu';
+  private readonly menuItemsSubject = new BehaviorSubject<Menu[]>([]);
+  public readonly menuItems$ = this.menuItemsSubject.asObservable();
+  private hasLoadedAuthorizedMenu = false;
 
-  constructor(private location:Location,
+  constructor(private http: HttpClient,
+              private location:Location,
               private router:Router){ } 
-    
+
+  public loadAuthorizedMenu(force = false): Observable<Menu[]> {
+    if (this.hasLoadedAuthorizedMenu && !force) {
+      return of(this.menuItemsSubject.value);
+    }
+
+    return this.http.get<Menu[]>(this.apiUrl).pipe(
+      tap(menuItems => {
+        this.hasLoadedAuthorizedMenu = true;
+        this.menuItemsSubject.next(menuItems);
+      }),
+      catchError(() => {
+        this.hasLoadedAuthorizedMenu = true;
+        this.menuItemsSubject.next([]);
+        return of([]);
+      })
+    );
+  }
+
+  public clearMenu(): void {
+    this.hasLoadedAuthorizedMenu = false;
+    this.menuItemsSubject.next([]);
+  }
+
   public getVerticalMenuItems():Array<Menu> {
-    return verticalMenuItems;
+    return this.menuItemsSubject.value;
   }
 
   public getHorizontalMenuItems():Array<Menu> {
-    return horizontalMenuItems;
+    return this.menuItemsSubject.value;
   }
 
   public expandActiveSubMenu(menu:Array<Menu>){

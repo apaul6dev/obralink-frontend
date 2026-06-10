@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, ViewEncapsulation, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, ViewEncapsulation, EventEmitter, OnChanges } from '@angular/core';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { MenuService } from '../../../../services/menu.service';
 import { Settings, SettingsService } from '../../../../services/settings.service';
@@ -24,18 +24,22 @@ import { TranslatePipe } from '../../../pipes/translate.pipe';
     styleUrls: ['./vertical-menu.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
-export class VerticalMenuComponent implements OnInit {
-  @Input('menuItems') menuItems: Menu[];
+export class VerticalMenuComponent implements OnInit, OnChanges {
+  @Input('menuItems') menuItems: Menu[] = [];
   @Input('menuParentId') menuParentId: any;
   @Output() onClickMenuItem:EventEmitter<any> = new EventEmitter<any>();
-  parentMenu:Array<any>;
+  parentMenu:Array<any> = [];
   public settings: Settings;
   constructor(public settingsService: SettingsService, public menuService:MenuService, public router:Router) { 
     this.settings = this.settingsService.settings;
   }
 
   ngOnInit() {     
-    this.parentMenu = this.menuItems.filter(item => item.parentId == this.menuParentId);  
+    this.filterParentMenu();
+  }
+
+  ngOnChanges() {
+    this.filterParentMenu();
   }
 
   ngAfterViewInit(){
@@ -58,6 +62,10 @@ export class VerticalMenuComponent implements OnInit {
     this.menuService.toggleMenuItem(menuId);
     this.menuService.closeOtherSubMenus(this.menuItems, menuId);
     this.onClickMenuItem.emit(menuId);     
+  }
+
+  private filterParentMenu() {
+    this.parentMenu = (this.menuItems ?? []).filter(item => item.parentId == this.menuParentId);
   }
 
 }

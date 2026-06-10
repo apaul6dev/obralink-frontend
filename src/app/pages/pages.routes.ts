@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
+import { permissionGuard } from '../services/auth.guard';
 
 export const routes: Routes = [
   {
@@ -18,18 +19,21 @@ export const routes: Routes = [
       },
       {
         path: 'companies',
+        canActivate: [permissionGuard],
         loadComponent: () => import('./companies/companies.component').then(c => c.CompaniesComponent),
-        data: { breadcrumb: 'nav.companies' }
+        data: { breadcrumb: 'nav.companies', requiredUserTypes: ['SYSTEM_OWNER'] }
       },
       {
         path: 'users',
+        canActivate: [permissionGuard],
         loadComponent: () => import('./users/users.component').then(c => c.UsersComponent),
-        data: { breadcrumb: 'nav.users' }
+        data: { breadcrumb: 'nav.users', requiredPermissions: ['ui.users.view'] }
       },
       {
         path: 'roles',
+        canActivate: [permissionGuard],
         loadComponent: () => import('./roles/roles.component').then(c => c.RolesComponent),
-        data: { breadcrumb: 'nav.roles' }
+        data: { breadcrumb: 'nav.roles', requiredPermissions: ['ui.roles.view'] }
       },
     ]
   }

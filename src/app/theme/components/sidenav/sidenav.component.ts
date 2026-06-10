@@ -26,14 +26,17 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class SidenavComponent implements OnInit {
   public userImage = 'img/users/user.jpg';
-  public menuItems: Array<any>;
+  public menuItems: Array<any> = [];
   public settings: Settings;
   constructor(public settingsService: SettingsService, public menuService: MenuService){
       this.settings = this.settingsService.settings; 
   }
 
   ngOnInit() {
-    this.menuItems = this.menuService.getVerticalMenuItems();
+    this.menuService.menuItems$.subscribe(menuItems => {
+      this.menuItems = menuItems;
+    });
+    this.menuService.loadAuthorizedMenu().subscribe();
   }
 
   public closeSubMenus(){

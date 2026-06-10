@@ -92,9 +92,11 @@ export class PagesComponent implements OnInit {
         } 
       }                
     });
-    if(this.settings.menu == "vertical") {
-      this.menuService.expandActiveSubMenu(this.menuService.getVerticalMenuItems());
-    } 
+    this.menuService.loadAuthorizedMenu().subscribe(menuItems => {
+      if(this.settings.menu == "vertical") {
+        this.menuService.expandActiveSubMenu(menuItems);
+      }
+    });
   } 
 
   public chooseMenu(){

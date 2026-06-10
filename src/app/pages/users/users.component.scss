@@ -1,0 +1,42 @@
+.toolbar {
+  margin-bottom: 16px;
+}
+
+.company-select {
+  min-width: 260px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 12px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-table tr.selected {
+  background: rgba(63, 81, 181, 0.08);
+}
+
+.actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.empty {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.mt-3 {
+  margin-top: 24px;
+}

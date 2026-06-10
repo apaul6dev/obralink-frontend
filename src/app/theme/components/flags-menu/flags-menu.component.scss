@@ -1,0 +1,19 @@
+.flags{
+    img{
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+    .flag-placeholder {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        margin-right: 8px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .mat-mdc-menu-item{
+        height: 36px;
+        line-height: 36px;
+    }
+}

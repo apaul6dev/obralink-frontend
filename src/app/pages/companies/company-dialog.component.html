@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>{{ data.company ? ('company.title.edit' | translate) : ('company.title.create' | translate) }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" fxLayout="column" fxLayoutGap="12px">
+    <mat-form-field>
+      <input matInput [placeholder]="'company.name' | translate" formControlName="name">
+      <mat-error>{{ 'common.nameRequired' | translate }}</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput [placeholder]="'company.legalName' | translate" formControlName="legalName">
+    </mat-form-field>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.taxId' | translate" formControlName="taxId">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-select [placeholder]="'company.customerStatus' | translate" formControlName="customerStatus">
+          @for (status of customerStatuses; track status) {
+            <mat-option [value]="status">{{ status }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <input matInput [placeholder]="'company.contactName' | translate" formControlName="contactName">
+    </mat-form-field>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.email' | translate" formControlName="email">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.phone' | translate" formControlName="phone">
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <input matInput [placeholder]="'company.address' | translate" formControlName="address">
+    </mat-form-field>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.city' | translate" formControlName="city">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.state' | translate" formControlName="state">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.customerType' | translate" formControlName="customerType">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.industry' | translate" formControlName="industry">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.billingEmail' | translate" formControlName="billingEmail">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.paymentTerms' | translate" formControlName="paymentTerms">
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <input matInput [placeholder]="'company.accountManager' | translate" formControlName="assignedAccountManager">
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close>{{ 'action.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()">{{ 'action.save' | translate }}</button>
+</mat-dialog-actions>

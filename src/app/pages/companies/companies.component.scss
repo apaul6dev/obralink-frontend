@@ -1,0 +1,30 @@
+.toolbar {
+  margin-bottom: 16px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.mat-mdc-row.selected {
+  background: rgba(63, 81, 181, 0.08);
+}
+
+.mat-mdc-row:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.empty {
+  padding: 24px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
+}

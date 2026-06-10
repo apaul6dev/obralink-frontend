@@ -1,0 +1,18 @@
+<button mat-icon-button [matMenuTriggerFor]="flagsMenu" #flagsMenuTrigger="matMenuTrigger">
+    <mat-icon>flag</mat-icon>
+</button>
+<!--<button mat-icon-button [matMenuTriggerFor]="flagsMenu" #flagsMenuTrigger="matMenuTrigger">
+    <img src="img/flags/gb.svg" width="20" alt="english"> 
+</button>-->
+<mat-menu #flagsMenu="matMenu" [overlapTrigger]="false" class="toolbar-dropdown-menu flags">
+    <span (mouseleave)="flagsMenuTrigger.closeMenu()">      
+        <button mat-menu-item type="button" (click)="changeLanguage('en')">
+            <img src="img/flags/gb.svg" width="20" alt="english"> 
+            {{ 'language.english' | translate }}
+        </button>
+        <button mat-menu-item type="button" (click)="changeLanguage('es')">
+            <span class="flag-placeholder">ES</span>
+            {{ 'language.spanish' | translate }}
+        </button>
+    </span>
+</mat-menu>

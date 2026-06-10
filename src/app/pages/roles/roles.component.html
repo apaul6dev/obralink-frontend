@@ -1,0 +1,49 @@
+<div class="p-3">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ 'nav.roles' | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="toolbar" fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-between center" fxLayoutGap="12px">
+        @if (isSystemOwner) {
+          <mat-form-field class="company-select">
+            <mat-select [placeholder]="'common.company' | translate" [ngModel]="selectedCompanyId" (ngModelChange)="changeCompany($event)">
+              @for (company of companies; track company.id) {
+                <mat-option [value]="company.id">{{ company.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+        <button mat-stroked-button color="primary" type="button" (click)="loadRoles()">
+          <mat-icon>refresh</mat-icon>
+          {{ 'action.refresh' | translate }}
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>{{ 'company.name' | translate }}</th>
+              <th>{{ 'common.code' | translate }}</th>
+              <th>{{ 'common.status' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (role of roles; track role.id) {
+              <tr>
+                <td>{{ role.name }}</td>
+                <td>{{ role.code }}</td>
+                <td>{{ role.status }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="empty">{{ isLoading ? ('common.loadingRoles' | translate) : ('common.noRoles' | translate) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,38 @@
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Settings, SettingsService } from '../../../services/settings.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { AppLanguage, TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+
+@Component({
+    selector: 'app-flags-menu',
+    imports: [
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule,
+        TranslatePipe
+    ],
+    templateUrl: './flags-menu.component.html',
+    styleUrls: ['./flags-menu.component.scss'],
+    encapsulation: ViewEncapsulation.None
+})
+export class FlagsMenuComponent implements OnInit {
+
+  public settings: Settings;
+  constructor(
+      public settingsService: SettingsService,
+      public translationService: TranslationService
+  ){
+      this.settings = this.settingsService.settings; 
+  }
+
+  ngOnInit() {
+  }
+
+  public changeLanguage(language: AppLanguage): void {
+    this.translationService.setLanguage(language);
+  }
+
+}

@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { finalize } from 'rxjs';
 import { Company } from '../../common/models/company.model';
@@ -27,6 +28,7 @@ import { TranslatePipe } from '../../theme/pipes/translate.pipe';
     MatIconModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatTooltipModule,
     TranslatePipe
   ],
   templateUrl: './roles.component.html',

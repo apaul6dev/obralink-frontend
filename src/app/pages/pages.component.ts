@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { SidenavComponent } from '../theme/components/sidenav/sidenav.component';
@@ -32,6 +33,7 @@ import { TranslatePipe } from '../theme/pipes/translate.pipe';
         MatButtonModule,
         MatSlideToggleModule,
         MatRadioModule,
+        MatTooltipModule,
         FlexLayoutModule,
         NgScrollbarModule,
         SidenavComponent,

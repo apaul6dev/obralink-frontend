@@ -1,38 +1,35 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { filter, finalize, switchMap } from 'rxjs';
 import { Company, CreateCompanyRequest } from '../../common/models/company.model';
-import { CreateCompanyAdminRequest } from '../../common/models/identity-user.model';
 import { CompaniesService } from '../../services/companies.service';
 import { TranslationService } from '../../services/translation.service';
-import { emailValidator } from '../../theme/utils/app-validators';
 import { TranslatePipe } from '../../theme/pipes/translate.pipe';
+import { CompanyAdminDialogComponent } from './company-admin-dialog.component';
 import { CompanyDialogComponent } from './company-dialog.component';
 
 @Component({
   selector: 'app-companies',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     FlexLayoutModule,
     MatButtonModule,
     MatCardModule,
     MatDialogModule,
     MatIconModule,
-    MatInputModule,
     MatPaginatorModule,
     MatSnackBarModule,
     MatTableModule,
+    MatTooltipModule,
     TranslatePipe
   ],
   templateUrl: './companies.component.html',
@@ -46,26 +43,13 @@ export class CompaniesComponent implements OnInit, AfterViewInit {
   public displayedColumns = ['name', 'taxId', 'status', 'customerStatus', 'actions'];
   public selectedCompany: Company | null = null;
   public isLoading = false;
-  public isCreatingAdmin = false;
-  public adminForm: FormGroup;
 
   constructor(
-    private fb: FormBuilder,
     private companiesService: CompaniesService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private translationService: TranslationService
-  ) {
-    this.adminForm = this.fb.group({
-      email: ['', [Validators.required, emailValidator]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      identificationNumber: [''],
-      personalEmail: ['', emailValidator],
-      phoneNumber: ['']
-    });
-  }
+  ) { }
 
   ngOnInit(): void {
     this.loadCompanies();
@@ -131,37 +115,12 @@ export class CompaniesComponent implements OnInit, AfterViewInit {
     });
   }
 
-  public createAdmin(): void {
-    if (!this.selectedCompany) {
-      this.showMessage('message.selectCompany');
-      return;
-    }
-
-    if (this.adminForm.invalid || this.isCreatingAdmin) {
-      this.adminForm.markAllAsTouched();
-      return;
-    }
-
-    this.isCreatingAdmin = true;
-    const value = this.adminForm.value as Record<string, string>;
-    const payload: CreateCompanyAdminRequest = {
-      email: value.email,
-      password: value.password,
-      firstName: value.firstName,
-      lastName: value.lastName,
-      identificationNumber: value.identificationNumber || null,
-      personalEmail: value.personalEmail || null,
-      phoneNumber: value.phoneNumber || null
-    };
-
-    this.companiesService.createAdmin(this.selectedCompany.id, payload).pipe(
-      finalize(() => this.isCreatingAdmin = false)
-    ).subscribe({
-      next: () => {
-        this.adminForm.reset();
-        this.showMessage('message.companyAdminCreated');
-      },
-      error: () => this.showMessage('message.couldNotCreateAdmin')
+  public openCompanyAdminsDialog(company: Company): void {
+    this.selectCompany(company);
+    this.dialog.open(CompanyAdminDialogComponent, {
+      width: '980px',
+      maxWidth: '95vw',
+      data: { company }
     });
   }
 
@@ -192,4 +151,5 @@ export class CompaniesComponent implements OnInit, AfterViewInit {
       { duration: 3000 }
     );
   }
+
 }

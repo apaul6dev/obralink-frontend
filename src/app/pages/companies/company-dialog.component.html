@@ -66,6 +66,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" mat-dialog-close>{{ 'action.cancel' | translate }}</button>
-  <button mat-raised-button color="primary" type="button" (click)="save()">{{ 'action.save' | translate }}</button>
+  <button mat-button type="button" mat-dialog-close [matTooltip]="'action.cancel' | translate" matTooltipPosition="above">{{ 'action.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [matTooltip]="'action.save' | translate" matTooltipPosition="above">{{ 'action.save' | translate }}</button>
 </mat-dialog-actions>

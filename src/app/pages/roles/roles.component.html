@@ -14,7 +14,7 @@
             </mat-select>
           </mat-form-field>
         }
-        <button mat-stroked-button color="primary" type="button" (click)="loadRoles()">
+        <button mat-stroked-button color="primary" type="button" (click)="loadRoles()" [matTooltip]="'action.refresh' | translate" matTooltipPosition="above">
           <mat-icon>refresh</mat-icon>
           {{ 'action.refresh' | translate }}
         </button>

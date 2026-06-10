@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { finalize } from 'rxjs';
 import { Company } from '../../common/models/company.model';
@@ -32,6 +33,7 @@ import { emailValidator } from '../../theme/utils/app-validators';
     MatInputModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatTooltipModule,
     TranslatePipe
   ],
   templateUrl: './users.component.html',
@@ -130,7 +132,10 @@ export class UsersComponent implements OnInit {
 
     this.rolesService.list(this.selectedCompanyId).subscribe({
       next: roles => this.roles = roles,
-      error: () => this.roles = []
+      error: () => {
+        this.roles = [];
+        this.showMessage('message.couldNotLoadRoles');
+      }
     });
   }
 

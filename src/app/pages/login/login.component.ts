@@ -15,6 +15,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-login',
@@ -27,6 +29,8 @@ import { MatIconModule } from '@angular/material/icon';
         MatInputModule,
         MatButtonModule,
         MatIconModule,
+        MatSnackBarModule,
+        MatTooltipModule,
         TranslatePipe
     ],
     templateUrl: './login.component.html'
@@ -41,6 +45,7 @@ export class LoginComponent {
               public fb: FormBuilder,
               public router: Router,
               private authService: AuthService,
+              private snackBar: MatSnackBar,
               private translationService: TranslationService){
     this.settings = this.settingsService.settings; 
     this.form = this.fb.group({
@@ -67,7 +72,10 @@ export class LoginComponent {
       finalize(() => this.isSubmitting = false)
     ).subscribe({
       next: () => this.router.navigate(['/']),
-      error: (error: HttpErrorResponse) => this.loginError = this.resolveLoginError(error)
+      error: (error: HttpErrorResponse) => {
+        this.loginError = this.resolveLoginError(error);
+        this.showMessage(this.loginError);
+      }
     });
   }
 
@@ -95,5 +103,13 @@ export class LoginComponent {
     }
 
     return this.translationService.translate('auth.couldNotSignIn');
+  }
+
+  private showMessage(message: string): void {
+    this.snackBar.open(
+      message,
+      this.translationService.translate('action.close'),
+      { duration: 3000 }
+    );
   }
 }

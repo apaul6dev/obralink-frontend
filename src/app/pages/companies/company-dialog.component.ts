@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { Company, CreateCompanyRequest, CustomerStatus } from '../../common/models/company.model';
 import { TranslatePipe } from '../../theme/pipes/translate.pipe';
@@ -24,6 +25,7 @@ export interface CompanyDialogData {
     MatDialogModule,
     MatInputModule,
     MatSelectModule,
+    MatTooltipModule,
     TranslatePipe
   ],
   templateUrl: './company-dialog.component.html'

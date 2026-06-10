@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -12,7 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { filter, finalize, switchMap } from 'rxjs';
 import { Company } from '../../common/models/company.model';
-import { IdentityUser } from '../../common/models/identity-user.model';
+import { IdentityUser, UserStatus, UserType } from '../../common/models/identity-user.model';
 import { Role } from '../../common/models/role.model';
 import { AuthService } from '../../services/auth.service';
 import { CompaniesService } from '../../services/companies.service';
@@ -21,17 +23,20 @@ import { RolesService } from '../../services/roles.service';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../theme/pipes/translate.pipe';
 import { UserDialogComponent, UserDialogResult } from './user-dialog.component';
+import { UserFiltersDialogComponent, UserFiltersDialogResult } from './user-filters-dialog.component';
 import { UserRolesDialogComponent } from './user-roles-dialog.component';
 
 @Component({
   selector: 'app-users',
   imports: [
     CommonModule,
+    FormsModule,
     FlexLayoutModule,
     MatButtonModule,
     MatCardModule,
     MatDialogModule,
     MatIconModule,
+    MatInputModule,
     MatPaginatorModule,
     MatSelectModule,
     MatSnackBarModule,
@@ -52,7 +57,12 @@ export class UsersComponent implements OnInit, AfterViewInit {
   public displayedColumns = ['user', 'type', 'phone', 'status', 'actions'];
   public selectedUser: IdentityUser | null = null;
   public selectedCompanyId: string | null = null;
+  public filterText = '';
+  public filterStatus = '';
+  public filterType = '';
   public isLoading = false;
+  public statuses: UserStatus[] = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
+  public userTypes: UserType[] = ['COMPANY_ADMIN', 'COMPANY_USER'];
 
   constructor(
     private authService: AuthService,
@@ -62,7 +72,9 @@ export class UsersComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private translationService: TranslationService
-  ) { }
+  ) {
+    this.dataSource.filterPredicate = (user, filter) => this.matchesFilters(user, filter);
+  }
 
   ngOnInit(): void {
     this.selectedCompanyId = this.authService.currentUser?.companyId ?? null;
@@ -95,6 +107,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
   public changeCompany(companyId: string): void {
     this.selectedCompanyId = companyId || null;
     this.selectedUser = null;
+    this.clearFilters();
     this.loadUsers();
     this.loadRoles();
   }
@@ -114,6 +127,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
       next: users => {
         this.users = users;
         this.dataSource.data = users;
+        this.applyFilters();
       },
       error: () => this.showMessage('message.couldNotLoadUsers')
     });
@@ -131,6 +145,44 @@ export class UsersComponent implements OnInit, AfterViewInit {
         this.roles = [];
         this.showMessage('message.couldNotLoadRoles');
       }
+    });
+  }
+
+  public applyFilters(): void {
+    this.dataSource.filter = JSON.stringify({
+      text: this.filterText.trim().toLowerCase(),
+      status: this.filterStatus,
+      type: this.filterType
+    });
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  public clearFilters(): void {
+    this.filterText = '';
+    this.filterStatus = '';
+    this.filterType = '';
+    this.applyFilters();
+  }
+
+  public openFiltersDialog(): void {
+    this.dialog.open(UserFiltersDialogComponent, {
+      width: '420px',
+      maxWidth: '95vw',
+      data: {
+        status: this.filterStatus,
+        type: this.filterType,
+        statuses: this.statuses,
+        userTypes: this.userTypes
+      }
+    }).afterClosed().pipe(
+      filter((result): result is UserFiltersDialogResult => !!result)
+    ).subscribe(result => {
+      this.filterStatus = result.status;
+      this.filterType = result.type;
+      this.applyFilters();
     });
   }
 
@@ -214,5 +266,23 @@ export class UsersComponent implements OnInit, AfterViewInit {
       this.translationService.translate('action.close'),
       { duration: 3000 }
     );
+  }
+
+  private matchesFilters(user: IdentityUser, filter: string): boolean {
+    const parsed = JSON.parse(filter || '{}') as { text?: string; status?: string; type?: string };
+    const haystack = [
+      user.firstName,
+      user.lastName,
+      user.email,
+      user.personalEmail,
+      user.phoneNumber,
+      user.identificationNumber
+    ].filter(Boolean).join(' ').toLowerCase();
+
+    const matchesText = !parsed.text || haystack.includes(parsed.text);
+    const matchesStatus = !parsed.status || user.status === parsed.status;
+    const matchesType = !parsed.type || user.userType === parsed.type;
+
+    return matchesText && matchesStatus && matchesType;
   }
 }

@@ -27,7 +27,23 @@
                 {{ 'action.refresh' | translate }}
               </button>
             </div>
-            <span>{{ dataSource.data.length }} {{ 'common.records' | translate }}</span>
+            <span>{{ dataSource.filteredData.length }} {{ 'common.records' | translate }}</span>
+          </div>
+
+          <div class="toolbar" fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-between center" fxLayoutGap="12px">
+            <mat-form-field fxFlex>
+              <input matInput [placeholder]="'user.search' | translate" [(ngModel)]="filterText" (ngModelChange)="applyFilters()">
+            </mat-form-field>
+            <div fxLayout="row" fxLayoutGap="8px">
+              <button mat-stroked-button color="primary" type="button" (click)="openFiltersDialog()" [matTooltip]="'action.filters' | translate" matTooltipPosition="above">
+                <mat-icon>filter_alt</mat-icon>
+                {{ 'action.filters' | translate }}
+              </button>
+              <button mat-stroked-button type="button" (click)="clearFilters()" [matTooltip]="'action.clearFilters' | translate" matTooltipPosition="above">
+                <mat-icon>filter_alt_off</mat-icon>
+                {{ 'action.clearFilters' | translate }}
+              </button>
+            </div>
           </div>
 
           <div class="table-wrapper">

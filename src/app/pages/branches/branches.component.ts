@@ -60,6 +60,10 @@ export class BranchesComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
+    this.authService.loadSession(true).subscribe(() => this.initializeCompanyScope());
+  }
+
+  private initializeCompanyScope(): void {
     this.selectedCompanyId = this.authService.currentUser?.companyId ?? null;
     this.loadCompanies();
     this.loadBranches();

@@ -74,7 +74,7 @@ export class AuthService {
       name: session.user.name || session.user.email,
       email: session.user.email,
       userType: session.user.userType ?? 'COMPANY_USER',
-      companyId: session.session.activeOrganizationId ?? null,
+      companyId: session.session.activeOrganizationId ?? session.user.companyId ?? null,
       branchId: session.user.branchId ?? null,
       roles: Array.isArray(role) ? role : (role ? role.split(',').map(value => value.trim()).filter(Boolean) : []),
       permissions: Array.isArray(session.user.permissions) ? session.user.permissions : []

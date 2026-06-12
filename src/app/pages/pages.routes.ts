@@ -35,6 +35,18 @@ export const routes: Routes = [
         loadComponent: () => import('./roles/roles.component').then(c => c.RolesComponent),
         data: { breadcrumb: 'nav.roles', requiredPermissions: ['ui.roles.view'] }
       },
+      {
+        path: 'menu-management',
+        canActivate: [permissionGuard],
+        loadComponent: () => import('./menu-management/menu-management.component').then(c => c.MenuManagementComponent),
+        data: { breadcrumb: 'nav.menuManagement', requiredUserTypes: ['SYSTEM_OWNER'] }
+      },
+      {
+        path: 'permissions',
+        canActivate: [permissionGuard],
+        loadComponent: () => import('./permissions/permissions.component').then(c => c.PermissionsComponent),
+        data: { breadcrumb: 'nav.permissions', requiredUserTypes: ['SYSTEM_OWNER'] }
+      },
     ]
   }
 ];

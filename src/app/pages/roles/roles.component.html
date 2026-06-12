@@ -8,41 +8,73 @@
         @if (isSystemOwner) {
           <mat-form-field class="company-select">
             <mat-select [placeholder]="'common.company' | translate" [ngModel]="selectedCompanyId" (ngModelChange)="changeCompany($event)">
+              <mat-option value="">{{ 'common.all' | translate }}</mat-option>
               @for (company of companies; track company.id) {
                 <mat-option [value]="company.id">{{ company.name }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
         }
-        <button mat-stroked-button color="primary" type="button" (click)="loadRoles()" [matTooltip]="'action.refresh' | translate" matTooltipPosition="above">
-          <mat-icon>refresh</mat-icon>
-          {{ 'action.refresh' | translate }}
-        </button>
+        <div fxLayout="row" fxLayoutGap="8px">
+          @if (isSystemOwner) {
+            <button mat-raised-button color="primary" type="button" (click)="openCreateDialog()" [matTooltip]="'role.create' | translate" matTooltipPosition="above">
+              <mat-icon>add</mat-icon>
+              {{ 'role.create' | translate }}
+            </button>
+          }
+          <button mat-stroked-button color="primary" type="button" (click)="loadRoles()" [matTooltip]="'action.refresh' | translate" matTooltipPosition="above">
+            <mat-icon>refresh</mat-icon>
+            {{ 'action.refresh' | translate }}
+          </button>
+        </div>
       </div>
 
       <div class="table-wrapper">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>{{ 'company.name' | translate }}</th>
-              <th>{{ 'common.code' | translate }}</th>
-              <th>{{ 'common.status' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (role of roles; track role.id) {
-              <tr>
-                <td>{{ role.name }}</td>
-                <td>{{ role.code }}</td>
-                <td>{{ role.status }}</td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="3" class="empty">{{ isLoading ? ('common.loadingRoles' | translate) : ('common.noRoles' | translate) }}</td>
-              </tr>
-            }
-          </tbody>
+        <table mat-table [dataSource]="dataSource" class="w-100">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>{{ 'company.name' | translate }}</th>
+            <td mat-cell *matCellDef="let role">{{ role.name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.code' | translate }}</th>
+            <td mat-cell *matCellDef="let role">{{ role.code }}</td>
+          </ng-container>
+          <ng-container matColumnDef="scope">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.scope' | translate }}</th>
+            <td mat-cell *matCellDef="let role">{{ scopeLabel(role) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.status' | translate }}</th>
+            <td mat-cell *matCellDef="let role">{{ role.status }}</td>
+          </ng-container>
+          <ng-container matColumnDef="permissions">
+            <th mat-header-cell *matHeaderCellDef>{{ 'nav.permissions' | translate }}</th>
+            <td mat-cell *matCellDef="let role">{{ (role.permissionCodes || []).length }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions"></th>
+            <td mat-cell *matCellDef="let role" class="actions">
+              @if (isSystemOwner) {
+                <button mat-icon-button type="button" (click)="openEditDialog(role)" [attr.aria-label]="'action.edit' | translate" [matTooltip]="'action.edit' | translate" matTooltipPosition="above">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" type="button" (click)="remove(role)" [attr.aria-label]="'action.delete' | translate" [matTooltip]="'action.delete' | translate" matTooltipPosition="above">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let role; columns: displayedColumns;"></tr>
         </table>
+        @if (!isLoading && dataSource.data.length === 0) {
+          <div class="empty">{{ 'common.noRoles' | translate }}</div>
+        }
+        @if (isLoading) {
+          <div class="empty">{{ 'common.loadingRoles' | translate }}</div>
+        }
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
       </div>
     </mat-card-content>
   </mat-card>

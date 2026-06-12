@@ -1,0 +1,43 @@
+<h2 mat-dialog-title>{{ data.role ? ('role.title.edit' | translate) : ('role.title.create' | translate) }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" fxLayout="column" fxLayoutGap="12px">
+    <mat-form-field>
+      <mat-select [placeholder]="'common.scope' | translate" formControlName="companyId">
+        <mat-option value="">{{ 'common.global' | translate }}</mat-option>
+        @for (company of data.companies; track company.id) {
+          <mat-option [value]="company.id">{{ company.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.name' | translate" formControlName="name">
+        <mat-error>{{ 'common.nameRequired' | translate }}</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'common.code' | translate" formControlName="code">
+        <mat-error>{{ 'common.codeRequired' | translate }}</mat-error>
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <mat-select [placeholder]="'common.status' | translate" formControlName="status">
+        @for (status of statuses; track status) {
+          <mat-option [value]="status">{{ status }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select [placeholder]="'nav.permissions' | translate" formControlName="permissionIds" multiple>
+        @for (permission of data.permissions; track permission.id) {
+          <mat-option [value]="permission.id">{{ permission.code }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close [matTooltip]="'action.cancel' | translate" matTooltipPosition="above">{{ 'action.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [matTooltip]="'action.save' | translate" matTooltipPosition="above">{{ 'action.save' | translate }}</button>
+</mat-dialog-actions>

@@ -1,0 +1,29 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { CreateMenuAdminItemRequest, MenuAdminItem, UpdateMenuAdminItemRequest } from '../common/models/menu-admin.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MenuAdminService {
+  private readonly apiUrl = '/api/identity/menu/admin';
+
+  constructor(private http: HttpClient) { }
+
+  list(): Observable<MenuAdminItem[]> {
+    return this.http.get<MenuAdminItem[]>(this.apiUrl);
+  }
+
+  create(payload: CreateMenuAdminItemRequest): Observable<MenuAdminItem> {
+    return this.http.post<MenuAdminItem>(this.apiUrl, payload);
+  }
+
+  update(menuItemId: string, payload: UpdateMenuAdminItemRequest): Observable<MenuAdminItem> {
+    return this.http.patch<MenuAdminItem>(`${this.apiUrl}/${menuItemId}`, payload);
+  }
+
+  remove(menuItemId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${menuItemId}`);
+  }
+}

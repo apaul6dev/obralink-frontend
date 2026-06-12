@@ -42,6 +42,9 @@ export const permissionGuard: CanActivateFn = (route) => {
       }
 
       const requiredPermissions = route.data?.['requiredPermissions'] as string[] | undefined;
+      if (user.userType === 'SYSTEM_OWNER') {
+        return true;
+      }
       if (requiredPermissions?.length && !requiredPermissions.every(permission => user.permissions.includes(permission))) {
         return router.createUrlTree(['/']);
       }

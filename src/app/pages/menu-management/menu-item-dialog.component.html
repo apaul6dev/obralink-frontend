@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>{{ data.menuItem ? ('menu.title.edit' | translate) : ('menu.title.create' | translate) }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" fxLayout="column" fxLayoutGap="12px">
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'common.code' | translate" formControlName="code">
+        <mat-error>{{ 'common.codeRequired' | translate }}</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'menu.titleKey' | translate" formControlName="titleKey">
+        <mat-error>{{ 'menu.titleKeyRequired' | translate }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'menu.routerLink' | translate" formControlName="routerLink">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'menu.href' | translate" formControlName="href">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'menu.icon' | translate" formControlName="icon">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput type="number" [placeholder]="'menu.displayOrder' | translate" formControlName="displayOrder">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <mat-select [placeholder]="'menu.parent' | translate" formControlName="parentId">
+          <mat-option value="">{{ 'common.none' | translate }}</mat-option>
+          @for (item of parentOptions; track item.id) {
+            <mat-option [value]="item.id">{{ item.titleKey }} ({{ item.code }})</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-select [placeholder]="'common.status' | translate" formControlName="status">
+          @for (status of statuses; track status) {
+            <mat-option [value]="status">{{ status }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <mat-select [placeholder]="'menu.allowedUserTypes' | translate" formControlName="allowedUserTypes" multiple>
+        @for (userType of userTypes; track userType) {
+          <mat-option [value]="userType">{{ userType }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select [placeholder]="'nav.permissions' | translate" formControlName="permissionIds" multiple>
+        @for (permission of data.permissions; track permission.id) {
+          <mat-option [value]="permission.id">{{ permission.code }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close [matTooltip]="'action.cancel' | translate" matTooltipPosition="above">{{ 'action.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [matTooltip]="'action.save' | translate" matTooltipPosition="above">{{ 'action.save' | translate }}</button>
+</mat-dialog-actions>

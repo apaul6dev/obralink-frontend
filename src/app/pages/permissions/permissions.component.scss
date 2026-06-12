@@ -6,13 +6,17 @@
   overflow-x: auto;
 }
 
+.mat-mdc-row:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
 .actions {
-  width: 104px;
+  white-space: nowrap;
   text-align: right;
 }
 
 .empty {
-  padding: 18px;
+  padding: 24px;
   text-align: center;
   color: rgba(0, 0, 0, 0.54);
 }

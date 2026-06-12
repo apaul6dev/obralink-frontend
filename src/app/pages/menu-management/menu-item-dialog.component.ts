@@ -36,7 +36,7 @@ export interface MenuItemDialogData {
 export class MenuItemDialogComponent {
   public form: FormGroup;
   public statuses: MenuStatus[] = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
-  public userTypes: UserType[] = ['SYSTEM_OWNER', 'COMPANY_ADMIN', 'COMPANY_USER'];
+  public userTypes: UserType[] = ['SYSTEM_OWNER', 'COMPANY_ADMIN', 'BRANCH_ADMIN', 'COMPANY_USER'];
 
   constructor(
     private fb: FormBuilder,

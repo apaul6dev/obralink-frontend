@@ -1,0 +1,47 @@
+<h2 mat-dialog-title>{{ data.branch ? ('branch.title.edit' | translate) : ('branch.title.create' | translate) }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" fxLayout="column" fxLayoutGap="12px">
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.name' | translate" formControlName="name">
+        <mat-error>{{ 'common.nameRequired' | translate }}</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'common.code' | translate" formControlName="code">
+        <mat-error>{{ 'common.codeRequired' | translate }}</mat-error>
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <input matInput [placeholder]="'company.address' | translate" formControlName="address">
+    </mat-form-field>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.city' | translate" formControlName="city">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.state' | translate" formControlName="state">
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.phone' | translate" formControlName="phone">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.email' | translate" formControlName="email">
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <mat-select [placeholder]="'common.status' | translate" formControlName="status">
+        @for (status of statuses; track status) {
+          <mat-option [value]="status">{{ status }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close [matTooltip]="'action.cancel' | translate" matTooltipPosition="above">{{ 'action.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [matTooltip]="'action.save' | translate" matTooltipPosition="above">{{ 'action.save' | translate }}</button>
+</mat-dialog-actions>

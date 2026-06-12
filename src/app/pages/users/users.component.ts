@@ -12,12 +12,14 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
-import { filter, finalize, switchMap } from 'rxjs';
+import { filter, finalize, of, switchMap } from 'rxjs';
 import { Company } from '../../common/models/company.model';
+import { CompanyBranch } from '../../common/models/company-branch.model';
 import { IdentityUser, UserStatus, UserType } from '../../common/models/identity-user.model';
 import { Role } from '../../common/models/role.model';
 import { AuthService } from '../../services/auth.service';
 import { CompaniesService } from '../../services/companies.service';
+import { CompanyBranchesService } from '../../services/company-branches.service';
 import { IdentityUsersService } from '../../services/identity-users.service';
 import { RolesService } from '../../services/roles.service';
 import { TranslationService } from '../../services/translation.service';
@@ -52,9 +54,10 @@ export class UsersComponent implements OnInit, AfterViewInit {
 
   public users: IdentityUser[] = [];
   public companies: Company[] = [];
+  public branches: CompanyBranch[] = [];
   public roles: Role[] = [];
   public dataSource = new MatTableDataSource<IdentityUser>([]);
-  public displayedColumns = ['user', 'type', 'phone', 'status', 'actions'];
+  public displayedColumns = ['user', 'type', 'branch', 'phone', 'status', 'actions'];
   public selectedUser: IdentityUser | null = null;
   public selectedCompanyId: string | null = null;
   public filterText = '';
@@ -62,11 +65,12 @@ export class UsersComponent implements OnInit, AfterViewInit {
   public filterType = '';
   public isLoading = false;
   public statuses: UserStatus[] = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
-  public userTypes: UserType[] = ['COMPANY_ADMIN', 'COMPANY_USER'];
+  public userTypes: UserType[] = ['COMPANY_ADMIN', 'BRANCH_ADMIN', 'COMPANY_USER'];
 
   constructor(
     private authService: AuthService,
     private companiesService: CompaniesService,
+    private branchesService: CompanyBranchesService,
     private usersService: IdentityUsersService,
     private rolesService: RolesService,
     private dialog: MatDialog,
@@ -79,6 +83,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.selectedCompanyId = this.authService.currentUser?.companyId ?? null;
     this.loadCompanies();
+    this.loadBranches();
     this.loadUsers();
     this.loadRoles();
   }
@@ -91,6 +96,10 @@ export class UsersComponent implements OnInit, AfterViewInit {
 
   public get isSystemOwner(): boolean {
     return this.authService.currentUser?.userType === 'SYSTEM_OWNER';
+  }
+
+  public get isBranchAdmin(): boolean {
+    return this.authService.currentUser?.userType === 'BRANCH_ADMIN';
   }
 
   public loadCompanies(): void {
@@ -108,6 +117,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
     this.selectedCompanyId = companyId || null;
     this.selectedUser = null;
     this.clearFilters();
+    this.loadBranches();
     this.loadUsers();
     this.loadRoles();
   }
@@ -125,6 +135,11 @@ export class UsersComponent implements OnInit, AfterViewInit {
       finalize(() => this.isLoading = false)
     ).subscribe({
       next: users => {
+        if (!this.selectedCompanyId && users[0]?.companyId) {
+          this.selectedCompanyId = users[0].companyId;
+          this.loadBranches();
+          this.loadRoles();
+        }
         this.users = users;
         this.dataSource.data = users;
         this.applyFilters();
@@ -140,10 +155,24 @@ export class UsersComponent implements OnInit, AfterViewInit {
     }
 
     this.rolesService.list(this.selectedCompanyId).subscribe({
-      next: roles => this.roles = roles,
+      next: roles => this.roles = this.isBranchAdmin ? roles.filter(role => role.code !== 'company.admin') : roles,
       error: () => {
         this.roles = [];
         this.showMessage('message.couldNotLoadRoles');
+      }
+    });
+  }
+
+  public loadBranches(): void {
+    if (!this.selectedCompanyId) {
+      this.branches = [];
+      return;
+    }
+    this.branchesService.list(this.selectedCompanyId).subscribe({
+      next: branches => this.branches = branches,
+      error: () => {
+        this.branches = [];
+        this.showMessage('message.couldNotLoadBranches');
       }
     });
   }
@@ -192,14 +221,32 @@ export class UsersComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    this.loadBranchesForDialog().subscribe(branches => {
+      this.branches = branches;
+      this.openCreateUserDialog();
+    });
+  }
+
+  public openEditDialog(user: IdentityUser): void {
+    this.selectedUser = user;
+    this.loadBranchesForDialog().subscribe(branches => {
+      this.branches = branches;
+      this.openEditUserDialog(user);
+    });
+  }
+
+  private openCreateUserDialog(): void {
     this.dialog.open(UserDialogComponent, {
       width: '760px',
       maxWidth: '95vw',
       data: {
         user: null,
         selectedCompanyId: this.selectedCompanyId,
+        currentBranchId: this.authService.currentUser?.branchId ?? null,
         companies: this.companies,
-        isSystemOwner: this.isSystemOwner
+        branches: this.branches,
+        isSystemOwner: this.isSystemOwner,
+        isBranchAdmin: this.isBranchAdmin
       }
     }).afterClosed().pipe(
       filter((result): result is UserDialogResult => !!result),
@@ -215,16 +262,18 @@ export class UsersComponent implements OnInit, AfterViewInit {
     });
   }
 
-  public openEditDialog(user: IdentityUser): void {
-    this.selectedUser = user;
+  private openEditUserDialog(user: IdentityUser): void {
     this.dialog.open(UserDialogComponent, {
       width: '760px',
       maxWidth: '95vw',
       data: {
         user,
         selectedCompanyId: this.selectedCompanyId,
+        currentBranchId: this.authService.currentUser?.branchId ?? null,
         companies: this.companies,
-        isSystemOwner: this.isSystemOwner
+        branches: this.branches,
+        isSystemOwner: this.isSystemOwner,
+        isBranchAdmin: this.isBranchAdmin
       }
     }).afterClosed().pipe(
       filter((result): result is UserDialogResult => !!result),
@@ -238,6 +287,17 @@ export class UsersComponent implements OnInit, AfterViewInit {
       },
       error: () => this.showMessage('message.couldNotUpdateUser')
     });
+  }
+
+  private loadBranchesForDialog() {
+    const companyId = this.selectedCompanyId ?? this.users[0]?.companyId ?? null;
+    if (!companyId) {
+      return of([]);
+    }
+    this.selectedCompanyId = companyId;
+    return this.branchesService.list(companyId).pipe(
+      finalize(() => undefined)
+    );
   }
 
   public openAssignRolesDialog(user: IdentityUser): void {
@@ -284,5 +344,12 @@ export class UsersComponent implements OnInit, AfterViewInit {
     const matchesType = !parsed.type || user.userType === parsed.type;
 
     return matchesText && matchesStatus && matchesType;
+  }
+
+  public branchName(branchId: string | null): string {
+    if (!branchId) {
+      return this.translationService.translate('common.allBranches');
+    }
+    return this.branches.find(branch => branch.id === branchId)?.name ?? branchId;
   }
 }

@@ -51,7 +51,7 @@
                   <button
                     mat-icon-button
                     type="button"
-                    (click)="openCompanyAdminsDialog(company)"
+                    (click)="selectCompanyForAdmins(company)"
                     [attr.aria-label]="'action.manageAdmins' | translate"
                     [matTooltip]="'action.manageAdmins' | translate"
                     matTooltipPosition="above">
@@ -89,6 +89,126 @@
         </mat-card-content>
       </mat-card>
     </div>
+
+    @if (selectedCompany) {
+      <div fxFlex="100">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>{{ 'admin.companyAdmins' | translate }} - {{ selectedCompany.name }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="toolbar" fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-between center" fxLayoutGap="12px">
+              <div fxLayout="row" fxLayoutGap="8px">
+                <button mat-stroked-button color="primary" type="button" (click)="newAdmin()" [matTooltip]="'action.createAdmin' | translate" matTooltipPosition="above">
+                  <mat-icon>person_add</mat-icon>
+                  {{ 'action.createAdmin' | translate }}
+                </button>
+                <button mat-stroked-button color="primary" type="button" (click)="loadAdmins()" [matTooltip]="'action.refresh' | translate" matTooltipPosition="above">
+                  <mat-icon>refresh</mat-icon>
+                  {{ 'action.refresh' | translate }}
+                </button>
+              </div>
+              <span>{{ admins.length }} {{ 'common.records' | translate }}</span>
+            </div>
+
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="16px">
+              <div fxFlex="45">
+                <div class="table-wrapper">
+                  <table mat-table [dataSource]="admins" class="w-100">
+                    <ng-container matColumnDef="user">
+                      <th mat-header-cell *matHeaderCellDef>{{ 'common.user' | translate }}</th>
+                      <td mat-cell *matCellDef="let admin">
+                        <strong>{{ admin.firstName }} {{ admin.lastName }}</strong><br>
+                        <small>{{ admin.email }}</small>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="status">
+                      <th mat-header-cell *matHeaderCellDef>{{ 'common.status' | translate }}</th>
+                      <td mat-cell *matCellDef="let admin">{{ admin.status }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                      <th mat-header-cell *matHeaderCellDef class="actions"></th>
+                      <td mat-cell *matCellDef="let admin" class="actions">
+                        <button mat-icon-button type="button" (click)="selectAdmin(admin)" [attr.aria-label]="'action.edit' | translate" [matTooltip]="'action.edit' | translate" matTooltipPosition="above">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="adminColumns"></tr>
+                    <tr
+                      mat-row
+                      *matRowDef="let admin; columns: adminColumns;"
+                      [class.selected]="selectedAdmin?.id === admin.id">
+                    </tr>
+                  </table>
+
+                  @if (!isLoadingAdmins && admins.length === 0) {
+                    <div class="empty">{{ 'common.noUsers' | translate }}</div>
+                  }
+                  @if (isLoadingAdmins) {
+                    <div class="empty">{{ 'common.loadingUsers' | translate }}</div>
+                  }
+                </div>
+              </div>
+
+              <div fxFlex="55">
+                <form [formGroup]="adminForm" fxLayout="column" fxLayoutGap="12px">
+                  <mat-form-field>
+                    <input matInput [placeholder]="'user.loginEmail' | translate" formControlName="email">
+                    <mat-error>{{ 'common.emailRequired' | translate }}</mat-error>
+                  </mat-form-field>
+                  @if (!isAdminEditMode) {
+                    <mat-form-field>
+                      <input matInput [placeholder]="'user.temporaryPassword' | translate" formControlName="password" type="password">
+                      <mat-error>{{ 'common.passwordMin' | translate }}</mat-error>
+                    </mat-form-field>
+                  }
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+                    <mat-form-field fxFlex>
+                      <input matInput [placeholder]="'user.firstName' | translate" formControlName="firstName">
+                      <mat-error>{{ 'user.firstNameRequired' | translate }}</mat-error>
+                    </mat-form-field>
+                    <mat-form-field fxFlex>
+                      <input matInput [placeholder]="'user.lastName' | translate" formControlName="lastName">
+                      <mat-error>{{ 'user.lastNameRequired' | translate }}</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <mat-form-field>
+                    <input matInput [placeholder]="'user.identificationNumber' | translate" formControlName="identificationNumber">
+                  </mat-form-field>
+                  <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+                    <mat-form-field fxFlex>
+                      <input matInput [placeholder]="'user.personalEmail' | translate" formControlName="personalEmail">
+                    </mat-form-field>
+                    <mat-form-field fxFlex>
+                      <input matInput [placeholder]="'user.phoneNumber' | translate" formControlName="phoneNumber">
+                    </mat-form-field>
+                  </div>
+                  @if (isAdminEditMode) {
+                    <mat-form-field>
+                      <mat-select [placeholder]="'common.status' | translate" formControlName="status">
+                        @for (status of statuses; track status) {
+                          <mat-option [value]="status">{{ status }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  }
+                  <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                    <button mat-button type="button" (click)="newAdmin()" [matTooltip]="'action.cancel' | translate" matTooltipPosition="above">{{ 'action.cancel' | translate }}</button>
+                    <button mat-raised-button color="primary" type="button" (click)="saveAdmin()" [disabled]="isSavingAdmin" [matTooltip]="(isAdminEditMode ? 'action.save' : 'action.createAdmin') | translate" matTooltipPosition="above">
+                      {{ isSavingAdmin ? ('action.saving' | translate) : (isAdminEditMode ? ('action.save' | translate) : ('action.createAdmin' | translate)) }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    }
 
   </div>
 </div>

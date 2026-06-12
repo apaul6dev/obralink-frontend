@@ -12,6 +12,17 @@
       </mat-form-field>
     }
     <mat-form-field>
+      <mat-select [placeholder]="'nav.branches' | translate" formControlName="branchId">
+        @if (!requiresBranch) {
+          <mat-option value="">{{ 'common.allBranches' | translate }}</mat-option>
+        }
+        @for (branch of data.branches; track branch.id) {
+          <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
+        }
+      </mat-select>
+      <mat-error>{{ 'common.branchRequired' | translate }}</mat-error>
+    </mat-form-field>
+    <mat-form-field>
       <input matInput [placeholder]="'user.loginEmail' | translate" formControlName="email" [readonly]="isEditMode">
       <mat-error>{{ 'common.emailRequired' | translate }}</mat-error>
     </mat-form-field>

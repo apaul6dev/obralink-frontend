@@ -10,6 +10,7 @@ export interface BetterAuthUser {
   emailVerified?: boolean;
   image?: string | null;
   userType?: string;
+  branchId?: string | null;
   permissions?: string[];
   role?: string | string[];
 }
@@ -33,6 +34,7 @@ export interface AuthenticatedUser {
   email: string;
   userType: string;
   companyId: string | null;
+  branchId: string | null;
   roles: string[];
   permissions: string[];
 }

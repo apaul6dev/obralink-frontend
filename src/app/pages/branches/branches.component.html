@@ -1,0 +1,83 @@
+<div class="p-3">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ 'nav.branches' | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="toolbar" fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-between center" fxLayoutGap="12px">
+        <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="8px">
+          @if (isSystemOwner) {
+            <mat-form-field class="company-select">
+              <mat-select [placeholder]="'common.company' | translate" [ngModel]="selectedCompanyId" (ngModelChange)="changeCompany($event)">
+                @for (company of companies; track company.id) {
+                  <mat-option [value]="company.id">{{ company.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+          @if (canManageBranches) {
+            <button mat-raised-button color="primary" type="button" (click)="openCreateDialog()" [matTooltip]="'branch.create' | translate" matTooltipPosition="above">
+              <mat-icon>add</mat-icon>
+              {{ 'branch.create' | translate }}
+            </button>
+          }
+          <button mat-stroked-button color="primary" type="button" (click)="loadBranches()" [matTooltip]="'action.refresh' | translate" matTooltipPosition="above">
+            <mat-icon>refresh</mat-icon>
+            {{ 'action.refresh' | translate }}
+          </button>
+        </div>
+        <span>{{ dataSource.data.length }} {{ 'common.records' | translate }}</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="dataSource" class="w-100">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>{{ 'company.name' | translate }}</th>
+            <td mat-cell *matCellDef="let branch">
+              <strong>{{ branch.name }}</strong><br>
+              <small>{{ branch.email || '-' }}</small>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.code' | translate }}</th>
+            <td mat-cell *matCellDef="let branch">{{ branch.code }}</td>
+          </ng-container>
+          <ng-container matColumnDef="location">
+            <th mat-header-cell *matHeaderCellDef>{{ 'branch.location' | translate }}</th>
+            <td mat-cell *matCellDef="let branch">{{ branch.city || '-' }} {{ branch.state || '' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="contact">
+            <th mat-header-cell *matHeaderCellDef>{{ 'company.phone' | translate }}</th>
+            <td mat-cell *matCellDef="let branch">{{ branch.phone || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.status' | translate }}</th>
+            <td mat-cell *matCellDef="let branch">{{ branch.status }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions"></th>
+            <td mat-cell *matCellDef="let branch" class="actions">
+              @if (canManageBranches) {
+                <button mat-icon-button type="button" (click)="openEditDialog(branch)" [attr.aria-label]="'action.edit' | translate" [matTooltip]="'action.edit' | translate" matTooltipPosition="above">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" type="button" (click)="remove(branch)" [attr.aria-label]="'action.delete' | translate" [matTooltip]="'action.delete' | translate" matTooltipPosition="above">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let branch; columns: displayedColumns;"></tr>
+        </table>
+        @if (!isLoading && dataSource.data.length === 0) {
+          <div class="empty">{{ 'common.noBranches' | translate }}</div>
+        }
+        @if (isLoading) {
+          <div class="empty">{{ 'common.loadingBranches' | translate }}</div>
+        }
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -30,6 +30,12 @@ export const routes: Routes = [
         data: { breadcrumb: 'nav.users', requiredPermissions: ['ui.users.view'] }
       },
       {
+        path: 'branches',
+        canActivate: [permissionGuard],
+        loadComponent: () => import('./branches/branches.component').then(c => c.BranchesComponent),
+        data: { breadcrumb: 'nav.branches', requiredPermissions: ['ui.branches.view'] }
+      },
+      {
         path: 'roles',
         canActivate: [permissionGuard],
         loadComponent: () => import('./roles/roles.component').then(c => c.RolesComponent),

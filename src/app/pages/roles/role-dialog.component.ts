@@ -16,6 +16,8 @@ export interface RoleDialogData {
   role: Role | null;
   companies: Company[];
   permissions: Permission[];
+  canSelectScope: boolean;
+  defaultCompanyId: string | null;
 }
 
 @Component({
@@ -43,7 +45,7 @@ export class RoleDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: RoleDialogData
   ) {
     this.form = this.fb.group({
-      companyId: [data.role?.companyId ?? ''],
+      companyId: [data.role?.companyId ?? data.defaultCompanyId ?? ''],
       name: [data.role?.name ?? '', Validators.required],
       code: [data.role?.code ?? '', Validators.required],
       status: [data.role?.status ?? 'ACTIVE', Validators.required],

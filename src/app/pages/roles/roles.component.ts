@@ -82,6 +82,18 @@ export class RolesComponent implements OnInit, AfterViewInit {
     return this.authService.currentUser?.userType === 'SYSTEM_OWNER';
   }
 
+  public get canCreateRole(): boolean {
+    return this.hasPermission('ui.roles.create');
+  }
+
+  public canUpdateRole(role: Role): boolean {
+    return this.hasPermission('ui.roles.update') && this.canManageRole(role);
+  }
+
+  public canDeleteRole(role: Role): boolean {
+    return this.hasPermission('ui.roles.delete') && this.canManageRole(role);
+  }
+
   public loadCompanies(): void {
     if (!this.isSystemOwner) {
       return;
@@ -99,7 +111,7 @@ export class RolesComponent implements OnInit, AfterViewInit {
   }
 
   public loadPermissions(): void {
-    if (!this.isSystemOwner) {
+    if (!this.hasPermission('identity.permissions.read')) {
       return;
     }
     this.permissionsService.list().subscribe({
@@ -122,13 +134,14 @@ export class RolesComponent implements OnInit, AfterViewInit {
   }
 
   public openCreateDialog(): void {
+    const currentCompanyId = this.authService.currentUser?.companyId ?? null;
     this.dialog.open(RoleDialogComponent, {
       width: '780px',
       maxWidth: '95vw',
-      data: { role: null, companies: this.companies, permissions: this.permissions }
+      data: { role: null, companies: this.companies, permissions: this.permissions, canSelectScope: this.isSystemOwner, defaultCompanyId: currentCompanyId }
     }).afterClosed().pipe(
       filter((payload): payload is CreateRoleRequest => !!payload),
-      switchMap(payload => this.rolesService.create(payload))
+      switchMap(payload => this.rolesService.create(this.withCurrentCompanyScope(payload)))
     ).subscribe({
       next: () => {
         this.showMessage('message.roleCreated');
@@ -142,10 +155,10 @@ export class RolesComponent implements OnInit, AfterViewInit {
     this.dialog.open(RoleDialogComponent, {
       width: '780px',
       maxWidth: '95vw',
-      data: { role, companies: this.companies, permissions: this.permissions }
+      data: { role, companies: this.companies, permissions: this.permissions, canSelectScope: this.isSystemOwner, defaultCompanyId: this.authService.currentUser?.companyId ?? null }
     }).afterClosed().pipe(
       filter((payload): payload is CreateRoleRequest => !!payload),
-      switchMap(payload => this.rolesService.update(role.id, payload))
+      switchMap(payload => this.rolesService.update(role.id, this.withCurrentCompanyScope(payload)))
     ).subscribe({
       next: () => {
         this.showMessage('message.roleUpdated');
@@ -169,7 +182,35 @@ export class RolesComponent implements OnInit, AfterViewInit {
     if (!role.companyId) {
       return this.translationService.translate('common.global');
     }
+    if (!this.isSystemOwner && role.companyId === this.authService.currentUser?.companyId) {
+      return this.translationService.translate('common.company');
+    }
     return this.companies.find(company => company.id === role.companyId)?.name ?? role.companyId;
+  }
+
+  private hasPermission(permission: string): boolean {
+    const currentUser = this.authService.currentUser;
+    if (currentUser?.userType === 'SYSTEM_OWNER') {
+      return true;
+    }
+    return currentUser?.permissions.includes(permission) ?? false;
+  }
+
+  private canManageRole(role: Role): boolean {
+    if (this.isSystemOwner) {
+      return true;
+    }
+    return !!role.companyId && role.companyId === this.authService.currentUser?.companyId;
+  }
+
+  private withCurrentCompanyScope(payload: CreateRoleRequest): CreateRoleRequest {
+    if (this.isSystemOwner) {
+      return payload;
+    }
+    return {
+      ...payload,
+      companyId: this.authService.currentUser?.companyId ?? null
+    };
   }
 
   private showMessage(key: string): void {

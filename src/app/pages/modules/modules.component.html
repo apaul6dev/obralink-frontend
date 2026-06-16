@@ -1,0 +1,75 @@
+<div class="p-3">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ 'nav.modules' | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="toolbar" fxLayout="row" fxLayout.lt-sm="column" fxLayoutAlign="space-between center" fxLayoutGap="12px">
+        <div fxLayout="row" fxLayoutGap="8px">
+          <button mat-raised-button color="primary" type="button" (click)="openCreateDialog()" [matTooltip]="'module.create' | translate" matTooltipPosition="above">
+            <mat-icon>add</mat-icon>
+            {{ 'module.create' | translate }}
+          </button>
+          <button mat-stroked-button color="primary" type="button" (click)="loadModules()" [matTooltip]="'action.refresh' | translate" matTooltipPosition="above">
+            <mat-icon>refresh</mat-icon>
+            {{ 'action.refresh' | translate }}
+          </button>
+        </div>
+        <span>{{ dataSource.data.length }} {{ 'common.records' | translate }}</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="dataSource" class="w-100">
+          <ng-container matColumnDef="module">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.module' | translate }}</th>
+            <td mat-cell *matCellDef="let module">
+              <div class="module-cell">
+                <mat-icon>{{ module.icon || 'view_module' }}</mat-icon>
+                <div>
+                  <strong>{{ module.name }}</strong><br>
+                  <small>{{ module.code }}</small>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.description' | translate }}</th>
+            <td mat-cell *matCellDef="let module">{{ module.description || '-' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="order">
+            <th mat-header-cell *matHeaderCellDef>{{ 'menu.displayOrder' | translate }}</th>
+            <td mat-cell *matCellDef="let module">{{ module.displayOrder }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.status' | translate }}</th>
+            <td mat-cell *matCellDef="let module">{{ module.status }}</td>
+          </ng-container>
+          <ng-container matColumnDef="system">
+            <th mat-header-cell *matHeaderCellDef>{{ 'module.system' | translate }}</th>
+            <td mat-cell *matCellDef="let module">{{ module.isSystem ? ('common.yes' | translate) : ('common.no' | translate) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions"></th>
+            <td mat-cell *matCellDef="let module" class="actions">
+              <button mat-icon-button type="button" (click)="openEditDialog(module)" [attr.aria-label]="'action.edit' | translate" [matTooltip]="'action.edit' | translate" matTooltipPosition="above">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" type="button" (click)="remove(module)" [attr.aria-label]="'action.delete' | translate" [matTooltip]="'action.delete' | translate" matTooltipPosition="above">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let module; columns: displayedColumns;"></tr>
+        </table>
+        @if (!isLoading && dataSource.data.length === 0) {
+          <div class="empty">{{ 'common.noModules' | translate }}</div>
+        }
+        @if (isLoading) {
+          <div class="empty">{{ 'common.loadingModules' | translate }}</div>
+        }
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

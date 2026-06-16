@@ -48,6 +48,12 @@ export const routes: Routes = [
         data: { breadcrumb: 'nav.menuManagement', requiredUserTypes: ['SYSTEM_OWNER'] }
       },
       {
+        path: 'modules',
+        canActivate: [permissionGuard],
+        loadComponent: () => import('./modules/modules.component').then(c => c.ModulesComponent),
+        data: { breadcrumb: 'nav.modules', requiredUserTypes: ['SYSTEM_OWNER'] }
+      },
+      {
         path: 'permissions',
         canActivate: [permissionGuard],
         loadComponent: () => import('./permissions/permissions.component').then(c => c.PermissionsComponent),

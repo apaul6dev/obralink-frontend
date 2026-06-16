@@ -8,7 +8,8 @@ export const verticalMenuItems = [
     new Menu (5, 'nav.branches', '/branches', null, 'account_tree', null, false, 2),
     new Menu (6, 'nav.roles', '/roles', null, 'verified_user', null, false, 2),
     new Menu (7, 'nav.menuManagement', '/menu-management', null, 'menu_open', null, false, 2),
-    new Menu (8, 'nav.permissions', '/permissions', null, 'key', null, false, 2)
+    new Menu (8, 'nav.modules', '/modules', null, 'view_module', null, false, 2),
+    new Menu (9, 'nav.permissions', '/permissions', null, 'key', null, false, 2)
 ]
 
 export const horizontalMenuItems = [ 
@@ -19,5 +20,6 @@ export const horizontalMenuItems = [
     new Menu (5, 'nav.branches', '/branches', null, 'account_tree', null, false, 2),
     new Menu (6, 'nav.roles', '/roles', null, 'verified_user', null, false, 2),
     new Menu (7, 'nav.menuManagement', '/menu-management', null, 'menu_open', null, false, 2),
-    new Menu (8, 'nav.permissions', '/permissions', null, 'key', null, false, 2)
+    new Menu (8, 'nav.modules', '/modules', null, 'view_module', null, false, 2),
+    new Menu (9, 'nav.permissions', '/permissions', null, 'key', null, false, 2)
 ]

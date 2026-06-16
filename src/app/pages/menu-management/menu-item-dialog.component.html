@@ -54,8 +54,15 @@
     </mat-form-field>
     <mat-form-field>
       <mat-select [placeholder]="'nav.permissions' | translate" formControlName="permissionIds" multiple>
-        @for (permission of data.permissions; track permission.id) {
-          <mat-option [value]="permission.id">{{ permission.code }}</mat-option>
+        @for (group of permissionGroups; track group.moduleId) {
+          <mat-optgroup [label]="group.label">
+            @for (permission of group.permissions; track permission.id) {
+              <mat-option [value]="permission.id">
+                {{ permission.label }}
+                <span class="permission-code">{{ permission.code }}</span>
+              </mat-option>
+            }
+          </mat-optgroup>
         }
       </mat-select>
     </mat-form-field>

@@ -8,14 +8,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { UserType } from '../../common/models/identity-user.model';
-import { CreateMenuAdminItemRequest, MenuAdminItem, MenuStatus } from '../../common/models/menu-admin.model';
-import { Permission } from '../../common/models/permission.model';
+import { CreateMenuAdminItemRequest, MenuAdminItem, MenuAdminOptions, MenuPermissionGroup, MenuStatus } from '../../common/models/menu-admin.model';
 import { TranslatePipe } from '../../theme/pipes/translate.pipe';
 
 export interface MenuItemDialogData {
   menuItem: MenuAdminItem | null;
   menuItems: MenuAdminItem[];
-  permissions: Permission[];
+  options: MenuAdminOptions | null;
 }
 
 @Component({
@@ -31,12 +30,18 @@ export interface MenuItemDialogData {
     MatTooltipModule,
     TranslatePipe
   ],
-  templateUrl: './menu-item-dialog.component.html'
+  templateUrl: './menu-item-dialog.component.html',
+  styles: [`
+    .permission-code {
+      display: block;
+      font-size: 11px;
+      opacity: 0.68;
+      line-height: 16px;
+    }
+  `]
 })
 export class MenuItemDialogComponent {
   public form: FormGroup;
-  public statuses: MenuStatus[] = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
-  public userTypes: UserType[] = ['SYSTEM_OWNER', 'COMPANY_ADMIN', 'BRANCH_ADMIN', 'COMPANY_USER'];
 
   constructor(
     private fb: FormBuilder,
@@ -60,7 +65,24 @@ export class MenuItemDialogComponent {
   }
 
   public get parentOptions(): MenuAdminItem[] {
-    return this.data.menuItems.filter(item => item.id !== this.data.menuItem?.id);
+    const blockedIds = new Set<string>();
+    if (this.data.menuItem) {
+      blockedIds.add(this.data.menuItem.id);
+      this.collectChildIds(this.data.menuItem.id, blockedIds);
+    }
+    return this.data.menuItems.filter(item => !blockedIds.has(item.id));
+  }
+
+  public get statuses(): MenuStatus[] {
+    return this.data.options?.statuses ?? ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
+  }
+
+  public get userTypes(): UserType[] {
+    return this.data.options?.userTypes ?? ['SYSTEM_OWNER', 'COMPANY_ADMIN', 'BRANCH_ADMIN', 'COMPANY_USER'];
+  }
+
+  public get permissionGroups(): MenuPermissionGroup[] {
+    return this.data.options?.permissionGroups ?? [];
   }
 
   public save(): void {
@@ -95,5 +117,13 @@ export class MenuItemDialogComponent {
       status: value.status,
       permissionIds: value.permissionIds ?? []
     });
+  }
+
+  private collectChildIds(parentId: string, blockedIds: Set<string>): void {
+    const children = this.data.menuItems.filter(item => item.parentId === parentId);
+    for (const child of children) {
+      blockedIds.add(child.id);
+      this.collectChildIds(child.id, blockedIds);
+    }
   }
 }

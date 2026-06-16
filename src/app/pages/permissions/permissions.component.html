@@ -24,6 +24,14 @@
             <th mat-header-cell *matHeaderCellDef>{{ 'common.code' | translate }}</th>
             <td mat-cell *matCellDef="let permission">{{ permission.code }}</td>
           </ng-container>
+          <ng-container matColumnDef="module">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.module' | translate }}</th>
+            <td mat-cell *matCellDef="let permission">{{ permission.moduleName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>{{ 'permission.category' | translate }}</th>
+            <td mat-cell *matCellDef="let permission">{{ permission.category }}</td>
+          </ng-container>
           <ng-container matColumnDef="description">
             <th mat-header-cell *matHeaderCellDef>{{ 'common.description' | translate }}</th>
             <td mat-cell *matCellDef="let permission">{{ permission.description || '-' }}</td>

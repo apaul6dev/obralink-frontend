@@ -44,7 +44,7 @@
     </div>
     <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
       <mat-form-field fxFlex>
-        <mat-select [placeholder]="'user.type' | translate" formControlName="userType" [disabled]="isEditMode">
+        <mat-select [placeholder]="'user.type' | translate" formControlName="userType">
           @for (type of userTypes; track type) {
             <mat-option [value]="type">{{ type }}</mat-option>
           }

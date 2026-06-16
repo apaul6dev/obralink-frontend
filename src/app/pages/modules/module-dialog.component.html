@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>{{ data.module ? ('module.title.edit' | translate) : ('module.title.create' | translate) }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" fxLayout="column" fxLayoutGap="12px">
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'common.code' | translate" formControlName="code">
+        <mat-error>{{ 'common.codeRequired' | translate }}</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'company.name' | translate" formControlName="name">
+        <mat-error>{{ 'common.nameRequired' | translate }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'menu.icon' | translate" formControlName="icon">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput type="number" [placeholder]="'menu.displayOrder' | translate" formControlName="displayOrder">
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <mat-select [placeholder]="'common.status' | translate" formControlName="status">
+        @for (status of statuses; track status) {
+          <mat-option [value]="status">{{ status }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-checkbox formControlName="isSystem">{{ 'module.system' | translate }}</mat-checkbox>
+    <mat-form-field>
+      <textarea matInput rows="3" [placeholder]="'common.description' | translate" formControlName="description"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close [matTooltip]="'action.cancel' | translate" matTooltipPosition="above">{{ 'action.cancel' | translate }}</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [matTooltip]="'action.save' | translate" matTooltipPosition="above">{{ 'action.save' | translate }}</button>
+</mat-dialog-actions>

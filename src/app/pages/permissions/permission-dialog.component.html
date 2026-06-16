@@ -6,6 +6,30 @@
       <input matInput [placeholder]="'common.code' | translate" formControlName="code">
       <mat-error>{{ 'common.codeRequired' | translate }}</mat-error>
     </mat-form-field>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <mat-select [placeholder]="'common.module' | translate" formControlName="moduleId">
+          @for (module of data.modules; track module.id) {
+            <mat-option [value]="module.id">{{ module.name }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ 'common.moduleRequired' | translate }}</mat-error>
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <mat-select [placeholder]="'permission.category' | translate" formControlName="category">
+          <mat-option value="API">API</mat-option>
+          <mat-option value="UI">UI</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="12px">
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'permission.action' | translate" formControlName="action">
+      </mat-form-field>
+      <mat-form-field fxFlex>
+        <input matInput [placeholder]="'permission.label' | translate" formControlName="label">
+      </mat-form-field>
+    </div>
     <mat-form-field>
       <textarea matInput rows="3" [placeholder]="'common.description' | translate" formControlName="description"></textarea>
     </mat-form-field>

@@ -9,8 +9,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
-import { filter, finalize, switchMap } from 'rxjs';
+import { filter, finalize, forkJoin, switchMap } from 'rxjs';
+import { AppModule } from '../../common/models/app-module.model';
 import { CreatePermissionRequest, Permission } from '../../common/models/permission.model';
+import { AppModulesService } from '../../services/app-modules.service';
 import { PermissionsService } from '../../services/permissions.service';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../theme/pipes/translate.pipe';
@@ -38,11 +40,13 @@ export class PermissionsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator?: MatPaginator;
 
   public dataSource = new MatTableDataSource<Permission>([]);
-  public displayedColumns = ['code', 'description', 'actions'];
+  public modules: AppModule[] = [];
+  public displayedColumns = ['code', 'module', 'category', 'description', 'actions'];
   public isLoading = false;
 
   constructor(
     private permissionsService: PermissionsService,
+    private appModulesService: AppModulesService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private translationService: TranslationService
@@ -60,10 +64,16 @@ export class PermissionsComponent implements OnInit, AfterViewInit {
 
   public loadPermissions(): void {
     this.isLoading = true;
-    this.permissionsService.list().pipe(
+    forkJoin({
+      permissions: this.permissionsService.list(),
+      modules: this.appModulesService.list()
+    }).pipe(
       finalize(() => this.isLoading = false)
     ).subscribe({
-      next: permissions => this.dataSource.data = permissions,
+      next: result => {
+        this.dataSource.data = result.permissions;
+        this.modules = result.modules;
+      },
       error: () => this.showMessage('message.couldNotLoadPermissions')
     });
   }
@@ -72,7 +82,7 @@ export class PermissionsComponent implements OnInit, AfterViewInit {
     this.dialog.open(PermissionDialogComponent, {
       width: '560px',
       maxWidth: '95vw',
-      data: { permission: null }
+      data: { permission: null, modules: this.modules }
     }).afterClosed().pipe(
       filter((payload): payload is CreatePermissionRequest => !!payload),
       switchMap(payload => this.permissionsService.create(payload))
@@ -89,7 +99,7 @@ export class PermissionsComponent implements OnInit, AfterViewInit {
     this.dialog.open(PermissionDialogComponent, {
       width: '560px',
       maxWidth: '95vw',
-      data: { permission }
+      data: { permission, modules: this.modules }
     }).afterClosed().pipe(
       filter((payload): payload is CreatePermissionRequest => !!payload),
       switchMap(payload => this.permissionsService.update(permission.id, payload))

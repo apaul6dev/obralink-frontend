@@ -10,10 +10,8 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { filter, finalize, forkJoin, switchMap } from 'rxjs';
-import { CreateMenuAdminItemRequest, MenuAdminItem } from '../../common/models/menu-admin.model';
-import { Permission } from '../../common/models/permission.model';
+import { CreateMenuAdminItemRequest, MenuAdminItem, MenuAdminOptions } from '../../common/models/menu-admin.model';
 import { MenuAdminService } from '../../services/menu-admin.service';
-import { PermissionsService } from '../../services/permissions.service';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../theme/pipes/translate.pipe';
 import { MenuItemDialogComponent } from './menu-item-dialog.component';
@@ -40,14 +38,13 @@ export class MenuManagementComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator?: MatPaginator;
 
   public menuItems: MenuAdminItem[] = [];
-  public permissions: Permission[] = [];
+  public options: MenuAdminOptions | null = null;
   public dataSource = new MatTableDataSource<MenuAdminItem>([]);
-  public displayedColumns = ['title', 'route', 'parent', 'order', 'status', 'actions'];
+  public displayedColumns = ['title', 'route', 'parent', 'permissions', 'order', 'status', 'actions'];
   public isLoading = false;
 
   constructor(
     private menuAdminService: MenuAdminService,
-    private permissionsService: PermissionsService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private translationService: TranslationService
@@ -67,13 +64,13 @@ export class MenuManagementComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     forkJoin({
       menuItems: this.menuAdminService.list(),
-      permissions: this.permissionsService.list()
+      options: this.menuAdminService.options()
     }).pipe(
       finalize(() => this.isLoading = false)
     ).subscribe({
       next: result => {
         this.menuItems = result.menuItems;
-        this.permissions = result.permissions;
+        this.options = result.options;
         this.dataSource.data = result.menuItems;
       },
       error: () => this.showMessage('message.couldNotLoadMenu')
@@ -84,7 +81,7 @@ export class MenuManagementComponent implements OnInit, AfterViewInit {
     this.dialog.open(MenuItemDialogComponent, {
       width: '820px',
       maxWidth: '95vw',
-      data: { menuItem: null, menuItems: this.menuItems, permissions: this.permissions }
+      data: { menuItem: null, menuItems: this.menuItems, options: this.options }
     }).afterClosed().pipe(
       filter((payload): payload is CreateMenuAdminItemRequest => !!payload),
       switchMap(payload => this.menuAdminService.create(payload))
@@ -101,7 +98,7 @@ export class MenuManagementComponent implements OnInit, AfterViewInit {
     this.dialog.open(MenuItemDialogComponent, {
       width: '820px',
       maxWidth: '95vw',
-      data: { menuItem, menuItems: this.menuItems, permissions: this.permissions }
+      data: { menuItem, menuItems: this.menuItems, options: this.options }
     }).afterClosed().pipe(
       filter((payload): payload is CreateMenuAdminItemRequest => !!payload),
       switchMap(payload => this.menuAdminService.update(menuItem.id, payload))
@@ -122,6 +119,13 @@ export class MenuManagementComponent implements OnInit, AfterViewInit {
       },
       error: () => this.showMessage('message.couldNotDeleteMenu')
     });
+  }
+
+  public permissionSummary(menuItem: MenuAdminItem): string {
+    if (!menuItem.permissions?.length) {
+      return '-';
+    }
+    return menuItem.permissions.map(permission => permission.label || permission.code).join(', ');
   }
 
   private showMessage(key: string): void {

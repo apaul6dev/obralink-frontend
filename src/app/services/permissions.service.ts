@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreatePermissionRequest, Permission, UpdatePermissionRequest } from '../common/models/permission.model';
+import { CreatePermissionRequest, Permission, PermissionCatalogGroup, UpdatePermissionRequest } from '../common/models/permission.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +13,14 @@ export class PermissionsService {
 
   list(): Observable<Permission[]> {
     return this.http.get<Permission[]>(this.apiUrl);
+  }
+
+  catalog(): Observable<PermissionCatalogGroup[]> {
+    return this.http.get<PermissionCatalogGroup[]>(`${this.apiUrl}/catalog`);
+  }
+
+  uiCatalog(): Observable<PermissionCatalogGroup[]> {
+    return this.http.get<PermissionCatalogGroup[]>(`${this.apiUrl}/catalog/ui`);
   }
 
   create(payload: CreatePermissionRequest): Observable<Permission> {

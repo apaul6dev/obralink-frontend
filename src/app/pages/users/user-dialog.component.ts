@@ -61,7 +61,7 @@ export class UserDialogComponent {
       password: ['', user ? [] : [Validators.required, Validators.minLength(8)]],
       firstName: [user?.firstName ?? '', Validators.required],
       lastName: [user?.lastName ?? '', Validators.required],
-      userType: [user?.userType ?? 'COMPANY_USER', Validators.required],
+      userType: [{ value: user?.userType ?? 'COMPANY_USER', disabled: !!user }, Validators.required],
       identificationNumber: [user?.identificationNumber ?? ''],
       personalEmail: [user?.personalEmail ?? '', emailValidator],
       phoneNumber: [user?.phoneNumber ?? ''],
